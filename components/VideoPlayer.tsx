@@ -51,10 +51,14 @@ export function VideoPlayer({ src, className, autoPlay = false, onPlayingChange 
             aria-label="Reproduzir vídeo"
             onClick={() => {
               setPlaying(true);
-              videoRef.current?.play();
+              // play() rejects with AbortError if the element leaves the
+              // document before playback starts — which is exactly what the
+              // back button in StagePanel does. Nothing to recover from: the
+              // player is already gone.
+              videoRef.current?.play().catch(() => {});
             }}
           >
-            <PlayIcon size={26} />
+            <PlayIcon size={18} />
           </button>
         )
       )}

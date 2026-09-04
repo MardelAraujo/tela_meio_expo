@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Stage, stages } from "@/config/stages";
 import { tour } from "@/config/tour";
 
@@ -83,7 +83,9 @@ export function useTour(onSelectStage: (stage: Stage | null) => void) {
       const progress = Math.min(1, elapsedRef.current / total);
       railRef.current?.style.setProperty("--tour-progress", String(progress));
       const nextSub = Math.min(parts - 1, Math.floor(progress * parts));
-      setSub(nextSub);
+      // Functional form so the no-op case is visibly a no-op: this runs on
+      // every animation frame, and PlantMap's memo hangs off it.
+      setSub((prev) => (prev === nextSub ? prev : nextSub));
       // Time spent inside the *current* sub-stage, not the whole chapter —
       // each stage in a multi-stage chapter gets its own approach-then-reveal
       // beat rather than only the first one.
@@ -137,22 +139,33 @@ export function useTour(onSelectStage: (stage: Stage | null) => void) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [index, goTo, stop]);
 
-  return {
-    index,
-    step,
-    running: index !== null,
-    paused,
-    // True once the current stage's zoom-in beat has finished and its video
-    // should be showing on the canvas in place of the establishing shot.
-    videoVisible,
-    railRef,
-    start: () => goTo(0),
-    stop,
-    goTo,
-    next: () => index !== null && goTo(index + 1),
-    previous: () => index !== null && goTo(index - 1),
-    togglePause: () => setPaused((value) => !value),
-  };
+  const start = useCallback(() => goTo(0), [goTo]);
+  const next = useCallback(() => index !== null && goTo(index + 1), [index, goTo]);
+  const previous = useCallback(() => index !== null && goTo(index - 1), [index, goTo]);
+  const togglePause = useCallback(() => setPaused((value) => !value), []);
+
+  // This object is a prop of the memoized <PlantMap>. Returned as a fresh
+  // literal with five fresh arrows, it changed identity on every render — and
+  // the rAF loop above renders often — so the memo would never hold.
+  return useMemo(
+    () => ({
+      index,
+      step,
+      running: index !== null,
+      paused,
+      // True once the current stage's zoom-in beat has finished and its video
+      // should be showing on the canvas in place of the establishing shot.
+      videoVisible,
+      railRef,
+      start,
+      stop,
+      goTo,
+      next,
+      previous,
+      togglePause,
+    }),
+    [index, step, paused, videoVisible, railRef, start, stop, goTo, next, previous, togglePause]
+  );
 }
 
 export type TourController = ReturnType<typeof useTour>;

@@ -1,0 +1,201 @@
+/* Automind — Design Tokens
+ * Brand: hot pink → navy gradient, bold geometric sans (Hando) + Red Hat Display.
+ * Hando is a substitution flag — using Archivo from Google Fonts as nearest match.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  /* ---------- BRAND COLORS ---------- */
+  --brand-pink:        #FA094E;   /* primary accent */
+  --brand-pink-deep:   #F70048;   /* hover/pressed, gradient top */
+  --brand-magenta:     #940755;   /* gradient mid */
+  --brand-purple:      #44055A;   /* gradient deep */
+  --brand-navy:        #03045E;   /* anchor dark */
+  --brand-navy-2:      #102D74;   /* secondary navy */
+
+  /* ---------- NEUTRALS ---------- */
+  --ink:               #100F0F;
+  --ink-2:             #2A2828;
+  --ink-3:             #555252;
+  --paper:             #F3F3F0;
+  --paper-2:           #E8E7E2;
+  --black:             #000000;
+  --white:             #FFFFFF;
+
+  /* ---------- SEMANTIC FG/BG ---------- */
+  --fg-1: var(--ink);
+  --fg-2: var(--ink-2);
+  --fg-3: var(--ink-3);
+  --bg-1: var(--white);
+  --bg-2: var(--paper);
+  --bg-dark: var(--black);
+  --accent: var(--brand-pink);
+  --accent-deep: var(--brand-pink-deep);
+  --on-accent: var(--white);
+
+  /* ---------- BRAND GRADIENTS ---------- */
+  --grad-hero:    linear-gradient(180deg, #F70048 4%, #03045E 88%);
+  --grad-hero-3:  linear-gradient(180deg, #F70048 4%, #102D74 70%, #002583 88%);
+  --grad-mark:    linear-gradient(180deg, #FA094E 0%, #940755 35%, #44055A 70%, #03045E 100%);
+  --grad-pill:    linear-gradient(90deg, #102D74 0%, #F70048 66%);
+
+  /* ---------- TYPE ---------- */
+  --font-display: 'Archivo', 'Hando', 'Helvetica Neue', system-ui, sans-serif;
+  --font-body:    'Red Hat Display', system-ui, sans-serif;
+
+  /* Type scale (display) */
+  --t-display-xl:  clamp(72px, 9vw, 128px);
+  --t-display-l:   clamp(56px, 6vw, 88px);
+  --t-display-m:   clamp(40px, 4.5vw, 64px);
+  --t-display-s:   clamp(32px, 3.5vw, 48px);
+
+  /* Type scale (body) */
+  --t-body-xl:     22px;
+  --t-body-l:      18px;
+  --t-body:        16px;
+  --t-body-s:      14px;
+  --t-caption:     12px;
+
+  /* Tracking */
+  --track-tight:   -0.01em;
+  --track-display: -0.02em;
+  --track-eyebrow: 0.14em;
+
+  /* Line-height */
+  --lh-display: 1;
+  --lh-tight:   1.15;
+  --lh-body:    1.5;
+
+  /* ---------- SPACING (4-pt) ---------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-14: 56px;
+  --s-18: 72px;
+  --s-24: 96px;
+  --s-32: 128px;
+
+  /* ---------- RADII ---------- */
+  --r-input:  8px;
+  --r-card:   12px;
+  --r-card-l: 20px;
+  --r-pill:   9999px;
+
+  /* ---------- BORDERS ---------- */
+  --bw-hair:  1px;
+  --bw-1:     1.3px;
+  --bw-2:     2.6px;
+  --border-on-light: 1px solid rgba(16,15,15,0.08);
+  --border-on-dark:  1.3px solid rgba(255,255,255,0.9);
+
+  /* ---------- SHADOWS ---------- */
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(3,4,94,0.06);
+  --shadow-pop:  0 12px 32px rgba(247,0,72,0.18);
+  --shadow-deep: 0 24px 60px rgba(3,4,94,0.30);
+
+  /* ---------- MOTION ---------- */
+  --ease-out:  cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast:  180ms;
+  --dur:       240ms;
+  --dur-slow:  420ms;
+}
+
+/* ---------- BASE TEXT STYLES ---------- */
+
+html, body {
+  font-family: var(--font-body);
+  color: var(--fg-1);
+  background: var(--bg-1);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.h1, h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--t-display-l);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  text-wrap: balance;
+}
+
+.h2, h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-display-m);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+  text-wrap: balance;
+}
+
+.h3, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-display-s);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-tight);
+}
+
+.h4, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-tight);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--brand-pink);
+}
+
+.lead, .body-l {
+  font-size: var(--t-body-l);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+
+.body, p {
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+
+.caption {
+  font-size: var(--t-caption);
+  letter-spacing: 0.02em;
+  color: var(--fg-3);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ---------- DARK MODE SECTION ---------- */
+.on-dark {
+  background: var(--black);
+  color: var(--white);
+}
+.on-dark p, .on-dark .body, .on-dark .lead { color: rgba(255,255,255,0.78); }
+.on-dark .eyebrow { color: var(--brand-pink); }

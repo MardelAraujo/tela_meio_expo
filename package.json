@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve@latest out -l ${PORT:-3000}",
-    "lint": "eslint"
+    "start": "serve out -l ${PORT:-3000}",
+    "lint": "eslint",
+    "assets": "node scripts/build-models.mjs && node scripts/check-bounds.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
@@ -17,11 +18,14 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.5.0",
+    "@gltf-transform/core": "^4.5.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "serve": "^14.2.6",
     "typescript": "^5"
   }
 }

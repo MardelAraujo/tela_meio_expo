@@ -12,3 +12,11 @@ services:
       - path: /videos/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
+      # o HTML precisa ser revalidado, senão um totem ligado ha dias nunca
+      # pega um redeploy
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /
+        name: Cache-Control
+        value: no-cache

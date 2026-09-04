@@ -1,25 +1,81 @@
+/* ---------------------------------------------------------------------------
+   Automind brand tokens. The palette block is the brand kit verbatim
+   (design_system_automind.md.md / colors_and_type.css); the surface, gradient
+   and shadow tokens under it are this totem's application of it.
+
+   Two brand rules run through the whole sheet:
+   - Magenta is never a flat fill. Every fill, rule, mark and active state
+     wears one of the brand gradients; solid pink is left only to borders,
+     focus rings and small type, where a gradient cannot read.
+   - Radius is 0 on every surface (see the reset below the base styles).
+--------------------------------------------------------------------------- */
+
 :root {
+  /* ---- Brand palette (kit verbatim) ---- */
+  --brand-pink: #fa094e;
+  --brand-pink-deep: #f70048;
+  --brand-magenta: #940755;
+  --brand-purple: #44055a;
+  --brand-navy: #03045e;
+  --brand-navy-2: #102d74;
   --ink: #100f0f;
-  --panel: #1c1a1e;
-  --panel-line: #2e2a30;
-  --magenta: #fa094e;
-  --wine: #44055a;
-  --navy: #03045e;
-  --brand-gradient: linear-gradient(15deg, var(--magenta) 20%, var(--wine) 100%);
   --paper: #f3f3f0;
-  --mist: #8a8790;
+
+  /* ---- Brand gradients ---- */
+  /* The M mark's own four stops. Vertical: square blocks and marks. */
+  --grad-mark: linear-gradient(180deg, #fa094e 0%, #940755 35%, #44055a 70%, #03045e 100%);
+  /* The same ramp turned horizontal — every 3px rule and bar in the product.
+     It lands on navy-2, not navy: at 3px on ink, #03045e is not a colour,
+     it is where the rule appears to stop. */
+  --brand-gradient: linear-gradient(90deg, #fa094e 0%, #940755 34%, #44055a 64%, #102d74 100%);
+  /* The kit's pill gradient — the one gradient for buttons and active states. */
+  --grad-pill: linear-gradient(90deg, #102d74 0%, #f70048 66%);
+  /* Translucent ramp for hover / selected states over glass. */
+  --grad-veil: linear-gradient(90deg, rgba(16, 45, 116, 0.34) 0%, rgba(250, 9, 78, 0.26) 100%);
+  /* Type cannot ride the full ramp: navy on ink is unreadable. Small brand
+     type gets the ramp's light half instead. */
+  --grad-text: linear-gradient(90deg, #ff7ea1 0%, #fa094e 60%, #f70048 100%);
+  /* Display-scale numerals can carry down to purple — at 6rem it still reads. */
+  --grad-display: linear-gradient(180deg, #fa094e 0%, #940755 62%, #44055a 100%);
+
+  /* ---- Surfaces ---- */
+  /* The kit's dark register, pulled a few degrees toward navy so the panels
+     read as the brand rather than as neutral chrome. */
+  --panel: #14131d;
+  --panel-line: #292739;
+  --surface-elevated: #1d1b28;
+  --surface-soft: rgba(255, 255, 255, 0.055);
+  --glass: rgba(12, 11, 24, 0.82);
+  --glass-strong: rgba(13, 12, 26, 0.94);
+  /* The terminal drawing's own paper, sampled off public/map/terminal.webp.
+     The map pane is filled with it so the letterbox left over when a wide
+     illustration meets a squarer pane reads as the drawing's own field
+     rather than as a bar. */
+  --map-paper: #d1ccc9;
+  --scrim: rgba(9, 9, 18, 0.95);
+  --mist: #8a879a;
   --background: var(--ink);
   --foreground: var(--paper);
-  --stage-transition: 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  --surface-elevated: #242127;
-  --surface-soft: rgba(255, 255, 255, 0.055);
-  --amber: #ffc857;
-  /* Reserved for a station the simulator puts over the line — the only
-     meaning in the interface that magenta and amber cannot carry. */
-  --alert: #ff4d3d;
-  /* --magenta at 10px on ink is below the contrast floor; this is the tint
+
+  /* Aliases kept for the rest of this sheet and for PlantMap's COLOR table. */
+  --magenta: var(--brand-pink);
+  --wine: var(--brand-purple);
+  --navy: var(--brand-navy);
+  /* --brand-pink at 10px on ink is below the contrast floor; this is the tint
      small type and marks use instead. */
   --magenta-soft: #ff7ea1;
+
+  --amber: #ffc857;
+  /* Reserved for a station the simulator puts over the line — the only meaning
+     in the interface that the brand ramp and amber cannot carry. */
+  --alert: #ff4d3d;
+
+  /* ---- Shadows: the kit's navy-tinted lift, not neutral black ---- */
+  --shadow-panel: 0 0 0 1px var(--panel-line), 0 18px 42px rgba(3, 4, 94, 0.3);
+  --shadow-pop: 0 12px 32px rgba(247, 0, 72, 0.28);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --stage-transition: 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
@@ -59,13 +115,30 @@ button {
   margin: 0;
 }
 
+/* Radius 0 on everything. The brand has almost no medium-rounded surface area,
+   and at totem scale — read standing a metre back — a hard corner reads as
+   engineered equipment rather than as a phone app blown up. One reset instead
+   of a radius on each rule, so a new surface inherits the decision. */
+*,
+*::before,
+*::after {
+  border-radius: 0;
+}
+
+/* Radius 0 on everything. The brand has almost no medium-rounded surface area,
+   and at totem scale — read standing a metre back — a hard corner reads as
+   engineered equipment rather than as a phone app blown up. One reset instead
+   of a radius on each rule, so a new surface inherits the decision. */
+*,
+*::before,
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
 :focus-visible {
-  outline: 2px solid var(--magenta);
+  outline: 2px solid var(--brand-pink);
   outline-offset: 2px;
 }
 
@@ -88,12 +161,9 @@ a {
   gap: 12px;
 }
 
-.topbar-wordmark {
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: clamp(1.05rem, 1rem + 1vw, 1.3rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.topbar-logo {
+  height: 21px;
+  width: auto;
 }
 
 .brand-rule {
@@ -113,13 +183,6 @@ a {
   padding: clamp(6px, 1.2vw, 10px) clamp(12px, 3vw, 24px) clamp(10px, 2vw, 16px);
 }
 
-.map-context-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px rgba(255, 200, 87, 0.16); display: inline-block; animation: live-pulse 2.4s ease-in-out infinite; }
-
-@keyframes live-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(255, 200, 87, 0.16); }
-  50% { box-shadow: 0 0 0 7px rgba(255, 200, 87, 0.3); }
-}
-
 /* ---- Two stacked screens: plant map on top, stage info below, 50/50 split ---- */
 
 .stage-view {
@@ -130,6 +193,9 @@ a {
   display: grid;
   grid-template-rows: 1fr 1fr;
   gap: clamp(8px, 1.5vw, 14px);
+  /* The split itself is the animation: both rows are <flex> values, which the
+     browser interpolates. Kit's "layout transition" band (320-480ms). */
+  transition: grid-template-rows 420ms var(--ease-out);
 }
 
 @media (min-width: 1600px) {
@@ -150,11 +216,11 @@ a {
   height: 100%;
   min-height: 0;
   isolation: isolate;
+  background: var(--map-paper);
   /* Above the stage panel: a later sibling at the same level would otherwise
      paint over anything the map's toolbar opens past its bottom edge. */
   z-index: 1;
-  border-radius: 16px;
-  box-shadow: 0 0 0 1px var(--panel-line), 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-panel);
 }
 
 .plant-map-wrapper::before {
@@ -165,63 +231,105 @@ a {
   background: var(--brand-gradient);
   z-index: 2;
   pointer-events: none;
-  border-radius: 16px 16px 0 0;
+}
+
+/* The drawing is light. The Autoload mark is white artwork and the secondary
+   action is dark glass, so both need something behind them at the top edge —
+   a shade the toolbar sits on, rather than a plate around each control. */
+.plant-map-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 148px;
+  background: linear-gradient(180deg, rgba(16, 15, 15, 0.46) 0%, rgba(16, 15, 15, 0.2) 45%, rgba(16, 15, 15, 0) 100%);
+  z-index: 20;
+  pointer-events: none;
 }
 
 .map-toolbar { position: absolute; z-index: 30; inset: 16px 16px auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; pointer-events: none; }
-.map-context, .map-reset, .map-layers { font-family: var(--font-display), sans-serif; letter-spacing: 0.06em; }
-.map-context { display: inline-flex; align-items: center; gap: 9px; padding: 9px 13px; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; background: rgba(17, 16, 18, .78); backdrop-filter: blur(10px); color: var(--paper); font-size: .72rem; text-transform: uppercase; }
-.map-reset { pointer-events: auto; border: 1px solid rgba(255,255,255,.14); color: var(--paper); background: rgba(17,16,18,.82); border-radius: 10px; padding: 9px 13px; font: 600 .72rem var(--font-display), sans-serif; cursor: pointer; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
-.map-reset:hover { background: var(--magenta); border-color: var(--magenta); transform: translateY(-1px); }
-/* The two readings that span the whole yard. They get the map's bottom-left
-   band — where the legend used to explain a pin shape the pins now explain
-   themselves — and a diamond mark, so they never read as one more spot on the
-   ground. */
-.map-layers { position: absolute; z-index: 4; bottom: 16px; left: 16px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.map-layers-title { font-size: .58rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(243,243,240,.5); }
-.map-layers-set { display: flex; gap: 8px; pointer-events: auto; }
-.layer-chip {
-  display: inline-flex; align-items: center; gap: 9px;
-  min-height: 44px; padding: 0 15px;
-  border: 1px solid rgba(255,255,255,.16); border-radius: 10px;
-  background: rgba(17,16,18,.82); backdrop-filter: blur(10px);
-  color: var(--paper);
-  font: 600 .74rem var(--font-display), var(--font-body), sans-serif; letter-spacing: .04em;
-  cursor: pointer; touch-action: manipulation;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+.map-reset { font-family: var(--font-display), sans-serif; letter-spacing: 0.06em; }
+/* The Autoload mark, white, sitting straight on the yard — no plate behind it.
+   A glass chip here would read as one more control; the badge is not something
+   you press. Sized by height (both dimensions set, so next/image does not warn
+   about a modified aspect). */
+.map-brand {
+  height: 26px;
+  width: auto;
+  /* It sits straight on a lit 3D scene the visitor can pan, so white artwork
+     can end up over the white tank farm, where a plain drop shadow leaves the
+     mark a ghost. The first two shadows have no offset: stacked, they read as
+     a thin dark outline that holds the strokes on any background without
+     putting a plate behind the logo. The last one does the ambient lift. */
+  filter:
+    drop-shadow(0 0 1px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 2px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 3px 12px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+  user-select: none;
 }
-.layer-chip-mark { width: 9px; height: 9px; border: 2px solid var(--magenta-soft); rotate: 45deg; transition: background-color 160ms ease, border-color 160ms ease; }
-.layer-chip:hover { border-color: var(--magenta); background: rgba(250,9,78,.12); }
-.layer-chip:active { transform: scale(.97); }
-.layer-chip[data-active] { background: var(--paper); border-color: var(--paper); color: var(--ink); }
-.layer-chip[data-active] .layer-chip-mark { background: var(--magenta); border-color: var(--magenta); }
+/* The primary map action. Returning to the whole yard is what a visitor does
+   between every stage, so it is the one control on the map that wears the
+   brand gradient. */
+.map-reset {
+  pointer-events: auto; border: none;
+  color: var(--paper); background: var(--grad-pill);
+  padding: 9px 14px;
+  font: 700 .72rem var(--font-display), sans-serif; text-transform: uppercase;
+  cursor: pointer; box-shadow: var(--shadow-pop);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.map-reset:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(247, 0, 72, .42); }
+.map-reset:active { transform: translateY(0) scale(.97); }
+/* ---- The map: one drawing on a layer the camera translates and scales ----
+   The scene is the window; the layer inside it is the artwork at its own
+   natural size, moved by a single transform. Signs ride inside that layer, so
+   they travel with the drawing for free — and counter-scale by --map-inv so
+   they stay the same size in CSS pixels however far in the map has come. */
 
-.plant-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border-radius: 16px;
-  background: var(--panel);
+/* Registered so it can be transitioned: an unregistered custom property is a
+   raw token, and the plates would snap to their final size the instant a
+   flight began while the drawing was still on its way. */
+@property --map-inv {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.plant-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--map-paper);
   cursor: grab;
+  /* The map handles its own pan and pinch through pointer events; without this
+     the browser takes the gesture for a page scroll and the drag never lands. */
   touch-action: none;
 }
 
-.plant-canvas:active {
+.plant-scene:active {
   cursor: grabbing;
 }
 
-.plant-loading {
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mist);
-  background: rgba(20, 20, 20, 0.75);
-  padding: 8px 16px;
-  border-radius: 999px;
-  white-space: nowrap;
+.plant-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* The camera writes translate/scale here; the origin has to be the layer's
+     own corner or the transform and the pins' percentage anchors disagree. */
+  transform-origin: 0 0;
 }
+
+.plant-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 460ms var(--ease-out);
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.plant-scene[data-ready] .plant-art { opacity: 1; }
 
 .map-error {
   position: absolute;
@@ -231,7 +339,6 @@ a {
   align-items: center;
   justify-content: center;
   gap: 14px;
-  border-radius: 16px;
   background: var(--panel);
   color: var(--paper);
   text-align: center;
@@ -242,7 +349,6 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--paper);
   background: rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
   padding: 9px 16px;
   font: 600 0.72rem var(--font-display), sans-serif;
   letter-spacing: 0.06em;
@@ -251,8 +357,8 @@ a {
 }
 
 .map-error button:hover {
-  background: var(--magenta);
-  border-color: var(--magenta);
+  background: var(--grad-pill);
+  border-color: var(--brand-pink);
 }
 
 .video-error {
@@ -267,45 +373,41 @@ a {
 
 /* Yard sign — the map's one signature object.
    A plate naming what stands here, on a short post, over a ring drawn on the
-   ground point itself. The plate is DOM projected onto a 3D position, so it is
-   sized in CSS pixels while the anchor comes from the camera: every dimension
-   that lifts it off the ground is in pixels too, which is what keeps a sign
-   the same size whether the camera is at the fence or across the yard. */
+   spot itself. Anchored in percentages of the artwork so it stays on its own
+   metre of asphalt, and sized in CSS pixels so it reads the same whether the
+   map is showing the whole terminal or one loading bay. */
 
 .yard-pin {
   /* Post height — the whole distance between the ground point and the plate. */
   --pin-lift: 34px;
-  position: relative;
+  position: absolute;
+  /* left/top put the box's *corner* on the point; this drops its bottom-centre
+     — the foot of the post — onto it instead. The scale runs about that same
+     bottom-centre, so undoing the layer's magnification never walks the sign
+     off the thing it names. */
+  transform: translate(-50%, -100%) scale(var(--map-inv, 1));
+  transform-origin: 50% 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: none;
   border: none;
-  /* The post is *inside* the button's box, not a paint-time offset above it.
-     <Html> measures this box to place and stack each sign, so a box that ends
-     at the ground point while the plate paints 150px higher hands the sign's
-     stacking order to a rectangle nobody can see — and the wrapper of a nearer
-     sign then sits on top of a farther sign's plate and eats its clicks. Real
-     height keeps what you see, what you click and what stacks as one rectangle. */
+  /* The post is *inside* the button's box, not a paint-time offset above it,
+     so what you see and what stacks are one rectangle. */
   padding: 0 0 var(--pin-lift);
   cursor: pointer;
-  /* ...but a box three times taller than the plate is also a hit area three
-     times taller than the plate: the padding above, and the wrapper's own half
-     hanging below the ground point, sat over the neighbouring sign and ate its
-     clicks — check-in and controle de filas stand in the same screen column,
-     and drei's depth-to-z-index mapping puts them one z apart, so which sign
-     won was arbitrary. The box still measures and stacks; only what is painted
-     takes the click. */
+  /* ...but a box three times taller than the plate would also be a hit area
+     three times taller than the plate, sitting over its neighbour and eating
+     that sign's taps — check-in and controle de filas stand in the same screen
+     column. It would swallow the map's own drag gesture too. The box still
+     measures and stacks; only what is painted takes the pointer. */
   pointer-events: none;
-  /* <Html center> centres this box on the projected point; this drops its
-     bottom edge — the foot of the post — onto that point. */
-  translate: 0 -50%;
   transition: opacity 260ms ease;
 }
 
-/* drei's own wrapper around the sign: centred on the ground point, so half of
-   it hangs *below* the point over whatever is down there. Never a target. */
-.yard-pin-anchor { pointer-events: none; }
+/* The sign being read stacks over the rest — plates overlap at the overview,
+   and the open one has to be the one you can reach. */
+.yard-pin[data-active] { z-index: 5; }
 
 /* The post. */
 .yard-pin::before {
@@ -316,7 +418,8 @@ a {
   width: 2px;
   height: var(--pin-lift);
   transform: translateX(-50%);
-  background: linear-gradient(to bottom, var(--magenta) 30%, rgba(250, 9, 78, 0));
+  /* The mark's own ramp, run down the post from the plate to the ground. */
+  background: linear-gradient(to bottom, #fa094e 0%, #940755 55%, rgba(68, 5, 90, 0) 100%);
   pointer-events: none;
 }
 
@@ -329,9 +432,8 @@ a {
   left: 50%;
   width: 11px;
   height: 11px;
-  border-radius: 50%;
-  border: 2px solid var(--magenta);
-  background: rgba(250, 9, 78, 0.18);
+  border: 2px solid var(--brand-pink);
+  background: var(--grad-veil);
   transform: translate(-50%, 50%);
   pointer-events: none;
 }
@@ -347,10 +449,9 @@ a {
   min-height: 44px;
   padding: 8px 15px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
-  background: rgba(20, 18, 22, 0.94);
+  background: var(--glass-strong);
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 26px rgba(3, 4, 94, 0.55);
   white-space: nowrap;
   overflow: hidden;
   transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background-color 220ms ease,
@@ -403,7 +504,7 @@ a {
 }
 
 .yard-pin[data-active] .yard-pin-name { color: var(--ink); }
-.yard-pin[data-active] .yard-pin-note { color: var(--wine); }
+.yard-pin[data-active] .yard-pin-note { color: var(--brand-magenta); }
 
 /* A step in the open place that is not the one being read: still named, just
    quieter. */
@@ -425,28 +526,19 @@ a {
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  border-radius: 16px;
   background: var(--panel);
   border: 1px solid var(--panel-line);
-  box-shadow: 0 0 0 1px var(--panel-line), 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-panel);
 }
 
-@media (max-width: 480px) {
-  .stage-panel-screen {
-    border-radius: 12px;
-  }
-}
 
 @media (orientation: landscape) and (max-height: 480px) {
   .stage-panel-header {
     padding: 10px 16px;
   }
-
-  .stage-panel-tabs {
-    padding: 8px;
-  }
 }
 
+/* The brand rule every surface in this interface wears. */
 .stage-panel-screen::before {
   content: "";
   position: absolute;
@@ -489,35 +581,64 @@ a {
   gap: 10px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid #3d3843;
-  border-radius: 12px;
   color: var(--paper);
   font-size: clamp(0.78rem, 0.7rem + 0.4vh, 0.9rem);
   font-weight: 600;
   text-align: left;
   padding: clamp(12px, 2vh, 16px) 16px;
   min-height: 56px;
+  /* A grid item's default min-width is its content, so a label wider than the
+     column pushed the chip past its own track instead of wrapping. */
+  min-width: 0;
   cursor: pointer;
   touch-action: manipulation;
   transition: border-color 150ms ease, background-color 150ms ease, transform 100ms ease;
+}
+
+/* StagePanel marks the slash in a label like "Estoque/Inventário" as a break
+   opportunity (<wbr>), which is where it should wrap. break-word is the
+   backstop for any future label with no break point at all: it only splits a
+   word that would otherwise overflow, so it never fires on ordinary copy. */
+.station-chip-label {
+  min-width: 0;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 .station-chip-dot {
   flex-shrink: 0;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: var(--magenta);
+  background: var(--grad-mark);
   box-shadow: 0 0 0 3px rgba(250, 9, 78, 0.18);
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+/* Auditoria and Gestão are readings across the whole operation, not spots in
+   the yard. They keep the hollow diamond they wore as map chips: same list,
+   same size, but the mark says these two are a different kind of thing. */
+.station-chip[data-layer] .station-chip-dot {
+  width: 9px;
+  height: 9px;
+  background: none;
+  border: 2px solid var(--magenta-soft);
+  box-shadow: none;
+  rotate: 45deg;
+}
+
+.station-chip[data-layer]:hover .station-chip-dot {
+  background: var(--grad-mark);
+  border-color: var(--brand-purple);
 }
 
 .station-chip:hover {
-  border-color: var(--magenta);
-  background: rgba(250, 9, 78, 0.08);
+  border-color: var(--brand-pink);
+  background: var(--grad-veil);
 }
 
 .station-chip:active {
   transform: scale(0.98);
-  background: rgba(250, 9, 78, 0.14);
+  background: linear-gradient(90deg, rgba(16, 45, 116, 0.5) 0%, rgba(250, 9, 78, 0.4) 100%);
 }
 
 .stage-panel-header {
@@ -537,59 +658,19 @@ a {
   line-height: 1.15;
   text-wrap: balance;
 }
-.stage-panel-kicker { display: block; color: var(--magenta); font: 700 .65rem var(--font-display), sans-serif; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
 
-.stage-panel-tabs {
-  position: relative;
-  display: flex;
-  gap: 0;
-  margin: 0 clamp(16px, 3vw, 30px) clamp(12px, 2vh, 18px);
-  padding: 5px;
-  background: var(--surface-soft);
-  border: 1px solid var(--panel-line);
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.stage-panel-tabs::before {
-  content: "";
-  position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: 5px;
-  width: calc(50% - 5px);
-  border-radius: 999px;
-  background: var(--brand-gradient);
-  box-shadow: 0 4px 12px rgba(250, 9, 78, 0.3);
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.stage-panel-tabs[data-active="video"]::before {
-  transform: translateX(100%);
-}
-
-.stage-panel-tabs button {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-radius: 999px;
-  color: #c9c6cd;
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: clamp(0.78rem, 0.7rem + 0.3vh, 0.9rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+.stage-panel-kicker {
+  display: block;
+  margin-bottom: 6px;
+  font: 700 .65rem var(--font-display), sans-serif;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  padding: clamp(13px, 2vh, 16px) 20px;
-  min-height: 52px;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: color 200ms ease;
-}
-
-.stage-panel-tabs button.is-active {
-  color: var(--paper);
+  /* The eyebrow carries the ramp rather than a flat accent — clipped to the
+     glyphs, so the brand still reads at 10px. */
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .stage-panel-body {
@@ -623,9 +704,8 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--brand-gradient);
+  background: var(--grad-pill);
   border: none;
-  border-radius: 999px;
   color: var(--paper);
   font: 700 0.9rem var(--font-display), sans-serif;
   letter-spacing: 0.06em;
@@ -634,13 +714,13 @@ a {
   min-height: 52px;
   cursor: pointer;
   touch-action: manipulation;
-  box-shadow: 0 6px 18px rgba(250, 9, 78, 0.3);
+  box-shadow: var(--shadow-pop);
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .stage-watch-video-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(250, 9, 78, 0.4);
+  box-shadow: 0 8px 22px rgba(247, 0, 72, 0.4);
 }
 
 .stage-watch-video-btn:active {
@@ -654,30 +734,20 @@ a {
   min-height: 0;
 }
 
-.stage-panel-video {
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  display: block;
-  background: black;
-  object-fit: contain;
-}
-
 .video-play-button {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
+  width: 50px;
+  height: 50px;
   border: none;
-  background: var(--brand-gradient);
+  background: var(--grad-mark);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   touch-action: manipulation;
-  box-shadow: 0 8px 24px rgba(250, 9, 78, 0.45);
+  box-shadow: 0 8px 24px rgba(247, 0, 72, 0.45);
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
@@ -692,6 +762,125 @@ a {
 .video-play-button:active {
   transform: scale(0.94);
 }
+
+/* ---- Stage clip takeover -------------------------------------------------
+   Reached from "assistir vídeo da etapa", after the camera has closed in on
+   the spot. Deliberately the same register as the guided presentation's
+   cinema beat: the room darkens around the film rather than a player opening
+   in a box, because both are the same act — the totem showing one thing. */
+
+.stage-cinema {
+  position: fixed;
+  inset: 0;
+  /* Over the tour takeover (50) and the assistant button (40). */
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+  padding: clamp(14px, 2.5vw, 28px);
+  /* --ink, not a player black: the takeover still belongs to this product. */
+  background: radial-gradient(ellipse 88% 68% at 50% 42%, #1c1b1a, var(--ink) 72%);
+  animation: fade-in 220ms ease;
+}
+
+.stage-cinema-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.stage-cinema-name {
+  font: 700 clamp(1rem, 2.2vw, 1.5rem) var(--font-display), sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-cinema-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(2px, 1vw, 10px);
+  flex-shrink: 0;
+}
+
+/* Bare glyphs. A plate behind them would put three more boxes on top of the
+   one thing the screen is for; the hit area stays full size regardless. */
+.stage-cinema-nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--paper);
+  font: 400 1.9rem var(--font-display), sans-serif;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  opacity: 0.75;
+  transition: opacity 150ms ease, transform 120ms ease;
+}
+
+.stage-cinema-nav button:hover { opacity: 1; }
+.stage-cinema-nav button:active { transform: scale(0.9); }
+.stage-cinema-close { font-size: 2.1rem; }
+
+/* The film. VideoPlayer wraps it in .stage-panel-video-wrap, which already
+   takes the free space in this column. */
+.stage-cinema-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: black;
+  /* Light coming off the screen, not a frame around it. */
+  box-shadow: 0 0 130px 20px rgba(255, 255, 255, 0.055), 0 26px 80px rgba(0, 0, 0, 0.55);
+}
+
+/* What was just watched, in reach of the eye that watched it — the panel
+   underneath is covered while this is open. */
+.stage-cinema-note {
+  position: relative;
+  flex-shrink: 0;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(14px, 2vh, 22px) clamp(16px, 3vw, 28px);
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+}
+
+.stage-cinema-note::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--brand-gradient);
+}
+
+.stage-cinema-note p {
+  margin-top: 6px;
+  color: var(--paper);
+  font-size: clamp(0.92rem, 0.8rem + 0.6vh, 1.15rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* The assistant button is the one control that outranks the map; a full
+   screen takeover outranks it back. */
+body:has(.stage-cinema) .ai-fab { display: none; }
+
+/* The beat before the film: the camera is pointing at one spot, so every sign
+   that is not that spot leaves the yard — the same call presentation mode
+   makes, for the same reason. */
+.plant-map-wrapper[data-highlight] .yard-pin:not([data-active]) { display: none; }
 
 /* ---- Video overlay ---- */
 
@@ -711,9 +900,8 @@ a {
   position: relative;
   background: var(--panel);
   border: 1px solid var(--panel-line);
-  border-radius: 12px;
   width: 100%;
-  max-width: 920px;
+  max-width: 1288px;
   padding: clamp(10px, 2vw, 16px);
   animation: pop-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
@@ -736,7 +924,6 @@ a {
 .video-overlay-close {
   background: transparent;
   border: none;
-  border-radius: 50%;
   color: var(--mist);
   cursor: pointer;
   width: 44px;
@@ -761,8 +948,16 @@ a {
 
 .video-overlay-player {
   width: 100%;
-  max-height: 70vh;
-  border-radius: 8px;
+  /* Raised with the width so height stops being the binding constraint on a
+     short window before the extra width can show. */
+  max-height: 80vh;
+  /* A <video> with no metadata yet reports the 300x150 default, so the panel
+     opened as a squat black band and snapped to full height a moment later —
+     a jump that got 40% bigger along with the panel. The assistant clip is the
+     only thing this ever plays and it is 1920x1080, so the box can be reserved
+     up front. */
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
   display: block;
   background: black;
 }
@@ -775,14 +970,13 @@ a {
   right: 24px;
   width: 60px;
   height: 60px;
-  border-radius: 50%;
-  background: var(--brand-gradient);
+  background: var(--grad-mark);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(250, 9, 78, 0.4);
+  box-shadow: 0 8px 24px rgba(247, 0, 72, 0.4);
   z-index: 40;
   touch-action: manipulation;
   transition: transform 150ms ease;
@@ -800,26 +994,23 @@ a {
    and controls that remain reachable without precision pointing. */
 @media (orientation: portrait) and (min-height: 800px) {
   .topbar { min-height: 76px; padding: 18px 28px; }
+  .topbar-logo { height: 28px; }
   .page { height: calc(100dvh - 79px); min-height: 0; padding: 24px 24px 28px; gap: 18px; }
   .stage-view { min-height: 0; }
   .map-toolbar { inset: 24px 24px auto; }
-  .map-context, .map-reset { min-height: 56px; padding: 0 18px; font-size: .82rem; border-radius: 14px; }
+  .map-reset, .map-present { min-height: 56px; padding: 0 18px; font-size: .82rem; }
+  .map-brand { height: 34px; }
   .map-reset { min-width: 150px; }
-  .map-layers { left: 24px; bottom: 24px; gap: 10px; }
-  .map-layers-title { font-size: .66rem; }
-  .layer-chip { min-height: 56px; padding: 0 20px; font-size: .86rem; border-radius: 14px; }
-  .layer-chip-mark { width: 11px; height: 11px; }
   .yard-pin { --pin-lift: 46px; }
-  .yard-pin-plate { min-height: 56px; padding: 10px 18px; border-radius: 14px; }
+  .yard-pin-plate { min-height: 56px; padding: 10px 18px; }
   .yard-pin-name { font-size: 17px; }
   .yard-pin-note { font-size: 11px; }
   .yard-pin::after { width: 13px; height: 13px; }
-  .stage-panel-tabs button { min-height: 60px; font-size: .95rem; }
   .station-chip { min-height: 64px; font-size: .95rem; }
-  .stage-panel-screen { border-radius: 22px; }
+  .stage-cinema-nav button { min-width: 60px; min-height: 60px; font-size: 2.3rem; }
   .video-overlay-close { width: 56px; height: 56px; }
   .stage-watch-video-btn { min-height: 62px; padding: 18px 36px; font-size: 1rem; }
-  .video-play-button { width: 84px; height: 84px; }
+  .video-play-button { width: 59px; height: 59px; }
   .ai-fab { width: 72px; height: 72px; right: 28px; bottom: 28px; }
 }
 
@@ -832,7 +1023,7 @@ a {
    of a jarring cliff back to the tablet tier. */
 @media (orientation: portrait) and (min-width: 900px) and (min-height: 1400px) {
   .topbar { min-height: 112px; padding: 26px 44px; }
-  .topbar-wordmark { font-size: 2.1rem; }
+  .topbar-logo { height: 41px; }
   .brand-rule { height: 5px; }
   .page { height: calc(100dvh - 117px); padding: 34px 36px 40px; gap: 26px; }
 
@@ -841,24 +1032,16 @@ a {
      one paragraph. */
   .stage-view { max-width: 100%; grid-template-rows: 1.12fr 0.88fr; gap: 26px; }
 
-  .plant-map-wrapper, .stage-panel-screen { border-radius: 26px; }
   .map-toolbar { inset: 30px 30px auto; }
-  .map-context, .map-reset { min-height: 76px; padding: 0 28px; font-size: 1.1rem; border-radius: 20px; }
+  .map-reset, .map-present { min-height: 76px; padding: 0 28px; font-size: 1.1rem; }
+  .map-brand { height: 52px; }
   .map-reset { min-width: 224px; }
-  .map-context-dot { width: 10px; height: 10px; }
-  /* Dropped here: it said the same thing as the panel's empty-state line right
-     below it, and at this scale it had nowhere to sit. The panel line carries
-     the instruction now. */
-  .map-layers { left: 34px; bottom: 34px; gap: 14px; }
-  .map-layers-title { font-size: .95rem; }
-  .layer-chip { min-height: 84px; padding: 0 30px; font-size: 1.25rem; border-radius: 18px; gap: 14px; }
-  .layer-chip-mark { width: 15px; height: 15px; border-width: 3px; }
 
   /* Read standing a metre back, against asphalt and grass: the plate carries
      the name at near-panel size, and the post grows with it so the sign clears
      the yard's own clutter without ever leaving the frame. */
   .yard-pin { --pin-lift: 74px; }
-  .yard-pin-plate { min-height: 84px; padding: 15px 28px; border-radius: 18px; gap: 4px; }
+  .yard-pin-plate { min-height: 84px; padding: 15px 28px; gap: 4px; }
   .yard-pin-name { font-size: 27px; }
   .yard-pin-note { font-size: 15px; }
   .yard-pin::before { width: 3px; }
@@ -867,36 +1050,33 @@ a {
   .stage-panel-header { padding: 36px 44px 22px; }
   .stage-panel-header h3 { font-size: 2.4rem; }
   .stage-panel-kicker { font-size: 1.05rem; margin-bottom: 12px; }
-  .stage-panel-tabs { margin: 0 44px 24px; padding: 8px; }
-  .stage-panel-tabs button { min-height: 86px; font-size: 1.25rem; }
   .stage-panel-body { padding: 36px 44px; }
+  .stage-cinema { gap: 26px; padding: 34px 36px 40px; }
+  .stage-cinema-nav button { min-width: 76px; min-height: 76px; font-size: 3rem; }
+  .stage-cinema-close { font-size: 3.4rem; }
+  .stage-cinema-note p { font-size: 1.6rem; }
   /* The pane is ~750px tall for one paragraph — at standing distance the type
      can carry that space instead of floating in the middle of it. */
   .stage-panel-description { font-size: 2rem; line-height: 1.55; max-width: none; }
   .stage-panel-description-wrap { max-width: 940px; gap: 44px; }
   .stage-watch-video-btn { min-height: 88px; padding: 26px 52px; font-size: 1.3rem; }
-  /* The assistant button is fixed to the viewport's bottom-right, which lands
-     inside the player. Only the video tab needs the clearance, and only as much
-     as the button actually occupies (100px tall, 36px up) — every pixel past
-     that comes straight out of the video. */
-  .stage-panel-body[data-tab="video"] { padding: 20px 44px 104px; }
 
   .stage-panel-empty { gap: 22px; padding: 36px 44px; }
   .stage-panel-empty-hint { font-size: 1.5rem; max-width: none; margin-bottom: 16px; }
   /* Wide enough for four columns of full stage names, so the grid fills the
      pane instead of floating in the middle of it. */
   .station-grid { max-width: 100%; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; }
-  .station-chip { min-height: 100px; font-size: 1.28rem; padding: 22px 26px; border-radius: 18px; gap: 16px; }
+  .station-chip { min-height: 100px; font-size: 1.28rem; padding: 22px 26px; gap: 16px; }
   .station-chip-dot { width: 12px; height: 12px; }
 
-  .video-play-button { width: 118px; height: 118px; }
+  .video-play-button { width: 83px; height: 83px; }
   .video-overlay-close { width: 80px; height: 80px; }
   .ai-fab { width: 100px; height: 100px; right: 36px; bottom: 36px; }
 }
 
 @media (pointer: coarse) {
-  .video-overlay-close, .map-reset, .stage-panel-tabs button, .station-chip, .video-play-button, .ai-fab { -webkit-tap-highlight-color: transparent; }
-  .map-reset:active, .stage-panel-tabs button:active, .station-chip:active, .stage-watch-video-btn:active { transform: scale(.97); }
+  .video-overlay-close, .map-reset, .map-present, .station-chip, .video-play-button, .ai-fab { -webkit-tap-highlight-color: transparent; }
+  .map-reset:active, .map-present:active, .station-chip:active, .stage-watch-video-btn:active { transform: scale(.97); }
 }
 
 @media (max-width: 480px) {
@@ -920,10 +1100,10 @@ a {
 
 @media (max-width: 700px) {
   .topbar { padding: 10px 18px; }
+  .topbar-logo { height: 15px; }
   .page { padding: 10px 12px 12px; gap: 8px; }
-  .map-context { font-size: .58rem; padding: 8px 10px; }
-  .map-reset { font-size: .62rem; padding: 8px 10px; }
-  .stage-panel-screen { border-radius: 12px; }
+  .map-brand { height: 20px; }
+  .map-reset, .map-present { font-size: .62rem; padding: 8px 10px; }
   .ai-fab { right: 16px; bottom: 16px; width: 54px; height: 54px; }
 }
 
@@ -932,12 +1112,10 @@ a {
    into a pane that has less height to give. */
 @media (max-width: 700px), (max-height: 760px) {
   .yard-pin { --pin-lift: 22px; }
-  .yard-pin-plate { min-height: 36px; padding: 6px 11px; border-radius: 10px; }
+  .yard-pin-plate { min-height: 36px; padding: 6px 11px; }
   .yard-pin-name { font-size: 11px; }
   .yard-pin-note { font-size: 9px; letter-spacing: .1em; }
   .yard-pin::after { width: 9px; height: 9px; }
-  .map-layers { left: 10px; bottom: 10px; gap: 6px; }
-  .layer-chip { min-height: 38px; padding: 0 11px; font-size: .64rem; }
 }
 
 /* ---- Guided tour: presentation mode for demos, trade shows and pitches ----
@@ -947,26 +1125,27 @@ a {
 /* Three controls now: let them wrap toward the right edge rather than
    push the context chip off a narrow map pane. */
 .map-actions { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; pointer-events: auto; }
+/* The secondary action. A presenter starts the guided tour once; a visitor
+   never needs it. It keeps a real target size but no visual weight — the
+   gradient belongs to "Visão geral" above it. */
 .map-present {
   display: inline-flex; align-items: center; gap: 7px;
-  border: none; border-radius: 10px; padding: 9px 14px;
-  background: var(--brand-gradient); color: var(--paper);
-  font: 700 .72rem var(--font-display), sans-serif; letter-spacing: .06em; text-transform: uppercase;
-  cursor: pointer; box-shadow: 0 6px 18px rgba(250, 9, 78, .32);
-  transition: transform .15s ease, box-shadow .15s ease;
+  border: 1px solid rgba(255,255,255,.14); padding: 9px 13px;
+  background: var(--glass); color: var(--paper);
+  font: 600 .72rem var(--font-display), sans-serif; letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
 }
-.map-present:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(250, 9, 78, .42); }
+.map-present:hover { background: var(--grad-pill); border-color: var(--brand-pink); transform: translateY(-1px); }
 .map-present:active { transform: translateY(0) scale(.97); }
 .map-present svg { fill: currentColor; }
 
-.plant-map-wrapper[data-presenting] .map-layers { display: none; }
 
 .tour-hud {
   position: absolute; z-index: 6; inset: auto 0 0 0;
   display: flex; flex-direction: column; gap: 10px;
   padding: 40px clamp(16px, 3vw, 26px) clamp(14px, 2vw, 18px);
-  background: linear-gradient(to top, rgba(16, 15, 15, .95) 46%, rgba(16, 15, 15, .6) 78%, transparent);
-  border-radius: 0 0 16px 16px;
+  background: linear-gradient(to top, var(--scrim) 46%, rgba(9, 9, 18, .6) 78%, transparent);
   pointer-events: none;
 }
 .tour-hud > * { pointer-events: auto; }
@@ -975,8 +1154,7 @@ a {
    so it stays readable over whatever the camera happens to be flying past. */
 .tour-caption {
   max-width: 62ch; margin: 0 auto; text-align: center;
-  padding: 11px clamp(14px, 2vw, 20px); border-radius: 12px;
-  background: rgba(16, 15, 15, .82); backdrop-filter: blur(8px);
+  padding: 11px clamp(14px, 2vw, 20px);  background: var(--glass); backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, .07);
   font-size: clamp(.86rem, 1.55vw, 1.05rem); line-height: 1.5;
   color: var(--paper); text-wrap: balance;
@@ -993,22 +1171,24 @@ a {
   font: 700 .72rem var(--font-display), sans-serif; letter-spacing: .12em; text-transform: uppercase;
   color: rgba(243, 243, 240, .8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.tour-chapter b { color: var(--magenta); font-size: .95rem; font-variant-numeric: tabular-nums; }
+.tour-chapter b {
+  font-size: .95rem; font-variant-numeric: tabular-nums;
+  background: var(--grad-text); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
 
 .tour-transport { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .tour-transport button {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; border-radius: 10px;
-  border: 1px solid transparent; background: transparent; color: var(--paper);
+  width: 38px; height: 38px;  border: 1px solid transparent; background: transparent; color: var(--paper);
   cursor: pointer; transition: background .15s ease, color .15s ease;
 }
 .tour-transport button:hover { background: var(--surface-soft); }
 .tour-transport button[aria-pressed="true"] { color: var(--mist); }
 .tour-transport .tour-exit { margin-left: 6px; border-color: rgba(255, 255, 255, .16); }
-.tour-transport .tour-exit:hover { background: var(--magenta); border-color: var(--magenta); }
+.tour-transport .tour-exit:hover { background: var(--grad-pill); border-color: var(--brand-pink); }
 .tour-transport button:focus-visible,
 .tour-rail-step:focus-visible,
-.map-present:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+.map-present:focus-visible { outline: 2px solid var(--brand-pink); outline-offset: 2px; }
 
 .tour-rail { display: flex; align-items: center; width: 100%; }
 .tour-rail-step {
@@ -1018,14 +1198,15 @@ a {
 .tour-rail-step::before,
 .tour-rail-fill {
   content: ""; position: absolute; left: 2px; right: 2px;
-  top: 50%; height: 4px; margin-top: -2px; border-radius: 2px;
-}
+  top: 50%; height: 4px; margin-top: -2px;}
 .tour-rail-step::before { background: rgba(255, 255, 255, .15); }
 .tour-rail-step:hover::before { background: rgba(255, 255, 255, .3); }
 /* Dashes stay a fixed size and get revealed by the clip, rather than being
    stretched by a scaling fill — the rhythm has to match the route on the map. */
 .tour-rail-fill {
-  background: repeating-linear-gradient(90deg, var(--magenta) 0 7px, rgba(250, 9, 78, .28) 7px 12px);
+  /* The brand ramp cut into dashes - pink dash, magenta gap - so the timeline
+     reads as the same gradient the rules and buttons wear. */
+  background: repeating-linear-gradient(90deg, #fa094e 0 7px, rgba(148, 7, 85, .45) 7px 12px);
   clip-path: inset(0 100% 0 0);
 }
 .tour-rail-step[data-state="current"] .tour-rail-fill {
@@ -1042,8 +1223,13 @@ a {
 }
 .tour-card-index {
   font: 700 clamp(3.4rem, 9vw, 6rem) var(--font-display), sans-serif;
-  line-height: 1; color: transparent;
-  -webkit-text-stroke: 2px var(--magenta);
+  line-height: 1;
+  /* Filled with the mark's ramp instead of outlined in flat magenta: at this
+     size it is the panel's one display-scale brand moment. */
+  background: var(--grad-display);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-variant-numeric: tabular-nums;
 }
 .tour-card-title {
@@ -1121,7 +1307,6 @@ a {
 .plant-map-wrapper[data-cinema] .tour-hud {
   position: fixed;
   z-index: 51;
-  border-radius: 0;
   padding-bottom: max(clamp(14px, 2vw, 18px), env(safe-area-inset-bottom));
 }
 
@@ -1143,14 +1328,13 @@ body:has(.plant-map-wrapper[data-cinema]) .ai-fab { display: none; }
 }
 
 @media (orientation: portrait) and (min-height: 800px) {
-  .map-present { min-height: 56px; padding: 0 20px; font-size: .82rem; border-radius: 14px; }
   .tour-hud { padding: 72px 24px 22px; gap: 14px; }
   .tour-caption { font-size: 1.12rem; line-height: 1.55; }
   .tour-chapter { font-size: .84rem; }
   .tour-chapter b { font-size: 1.1rem; }
-  .tour-transport button { width: 56px; height: 56px; border-radius: 14px; }
+  .tour-transport button { width: 56px; height: 56px; }
   .tour-rail-step { padding: 16px 0; }
-  .tour-rail-step::before, .tour-rail-fill { height: 7px; margin-top: -3.5px; border-radius: 4px; }
+  .tour-rail-step::before, .tour-rail-fill { height: 7px; margin-top: -3.5px; }
 }
 
 @media (max-width: 700px) {
@@ -1168,8 +1352,8 @@ body:has(.plant-map-wrapper[data-cinema]) .ai-fab { display: none; }
 .scenario-picker { position: relative; pointer-events: auto; }
 .scenario-trigger {
   display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px;
-  border: 1px solid rgba(255, 255, 255, .14); border-radius: 10px; padding: 6px 13px;
-  background: rgba(17, 16, 18, .82); color: var(--paper);
+  border: 1px solid rgba(255, 255, 255, .14); padding: 6px 13px;
+  background: var(--glass); color: var(--paper);
   font: 600 .72rem var(--font-display), sans-serif; letter-spacing: .06em;
   cursor: pointer; text-align: left;
   transition: border-color .15s ease, background-color .15s ease;
@@ -1184,17 +1368,16 @@ body:has(.plant-map-wrapper[data-cinema]) .ai-fab { display: none; }
   position: absolute; z-index: 20; top: calc(100% + 8px); right: 0;
   width: min(272px, 78vw); max-height: 60vh; overflow-y: auto;
   list-style: none; padding: 6px;
-  background: var(--surface-elevated); border: 1px solid var(--panel-line);
-  border-radius: 14px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+  background: var(--surface-elevated); border: 1px solid var(--panel-line); box-shadow: 0 24px 60px rgba(3, 4, 94, .55);
 }
 .scenario-option {
   display: block; width: 100%;
-  padding: 10px 13px; border: none; border-radius: 10px; background: none;
+  padding: 10px 13px; border: none; background: none;
   color: var(--paper); text-align: left; cursor: pointer;
   transition: background-color .12s ease;
 }
 .scenario-option:hover { background: var(--surface-soft); }
-.scenario-option.is-active { background: rgba(250, 9, 78, .16); }
+.scenario-option.is-active { background: var(--grad-veil); }
 .scenario-option-title { font: 700 .82rem var(--font-display), sans-serif; letter-spacing: .02em; }
 
 .scenario-summary {
@@ -1213,8 +1396,7 @@ body:has(.plant-map-wrapper[data-cinema]) .ai-fab { display: none; }
 .scenario-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
 .scenario-metric {
   display: flex; flex-direction: column; gap: 2px;
-  padding: 11px 13px; border-radius: 12px;
-  background: var(--surface-soft); border: 1px solid var(--panel-line);
+  padding: 11px 13px;  background: var(--surface-soft); border: 1px solid var(--panel-line);
 }
 .scenario-metric-label { font: 700 .58rem var(--font-display), sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
 .scenario-metric-value { font: 700 clamp(1rem, 1.8vh + .6rem, 1.3rem) var(--font-display), sans-serif; line-height: 1.1; }
@@ -1236,7 +1418,7 @@ body:has(.plant-map-wrapper[data-cinema]) .ai-fab { display: none; }
 .yard-pin[data-impact="critico"] { --pin-alert: var(--alert); }
 
 @media (orientation: portrait) and (min-height: 800px) {
-  .scenario-trigger { min-height: 56px; justify-content: center; padding: 0 18px; font-size: .82rem; border-radius: 14px; }
+  .scenario-trigger { min-height: 56px; justify-content: center; padding: 0 18px; font-size: .82rem; }
   .scenario-option { padding: 15px; }
   .scenario-option-title { font-size: .92rem; }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Stage, stageLabel, stages } from "@/config/stages";
 import { Scenario } from "@/config/scenarios";
 import { tourMinutes } from "@/config/tour";
@@ -8,20 +7,42 @@ import { ScenarioResult } from "@/lib/scenario-model";
 import { ScenarioSummary } from "./ScenarioPanel";
 import { TourController } from "@/lib/use-tour";
 import { TourTitleCard } from "./GuidedTour";
-import { VideoPlayer } from "./VideoPlayer";
+import { PlayIcon } from "./icons";
 
-type Tab = "descricao" | "video";
+/* "Estoque/Inventário" is a single 18-character token: no space, so nothing to
+   wrap at, and it ran out of its chip. A slash is the one place it reads
+   correctly broken, so mark that as the break opportunity — without it the
+   overflow-wrap fallback in globals.css splits it as "Estoque/Invent | ário". */
+function wrappableLabel(label: string) {
+  return label.split("/").map((part, i, all) => (
+    <span key={i}>
+      {part}
+      {i < all.length - 1 && "/"}
+      {i < all.length - 1 && <wbr />}
+    </span>
+  ));
+}
 
 function StageEmptyState({ onSelectStage }: { onSelectStage: (stage: Stage) => void }) {
   return (
     <div className="stage-panel-empty">
       <span className="stage-panel-kicker">Etapa da operação</span>
       <p className="stage-panel-empty-hint">Arraste a planta para explorar. Toque em um ponto do pátio ou escolha uma etapa abaixo.</p>
+      {/* Every stage, in operation order — the two layer readings (auditoria,
+          gestão) close the list. They keep the diamond mark they wore as map
+          chips, so "reads across the whole operation" still looks different
+          from "happens at this spot" without needing a second list. */}
       <div className="station-grid">
-        {stages.filter((s) => !s.layer).map((s) => (
-          <button type="button" key={s.id} className="station-chip" onClick={() => onSelectStage(s)}>
+        {stages.map((s) => (
+          <button
+            type="button"
+            key={s.id}
+            className="station-chip"
+            data-layer={s.layer || undefined}
+            onClick={() => onSelectStage(s)}
+          >
             <span className="station-chip-dot" />
-            {stageLabel(s)}
+            <span className="station-chip-label">{wrappableLabel(stageLabel(s))}</span>
           </button>
         ))}
       </div>
@@ -29,46 +50,26 @@ function StageEmptyState({ onSelectStage }: { onSelectStage: (stage: Stage) => v
   );
 }
 
-function StageContent({ stage }: { stage: Stage }) {
-  // The tour plays each clip full screen over the whole totem (see TourStage
-  // in PlantMap), synced to the camera flight and the narration. So the panel
-  // never opens on the video tab and never autoplays: the takeover owns
-  // playback, the panel keeps the description a visitor can read once the
-  // presentation hands the screen back.
-  const [tab, setTab] = useState<Tab>("descricao");
-  const [videoPlaying, setVideoPlaying] = useState(false);
-  const hideChrome = tab === "video" && videoPlaying;
-
-  const activateTabOnTouch = (event: React.PointerEvent<HTMLButtonElement>, nextTab: Tab) => {
-    if (event.pointerType === "touch" || event.pointerType === "pen") {
-      event.preventDefault();
-      event.stopPropagation();
-      setTab(nextTab);
-    }
-  };
-
+/* One surface, not two tabs. The clip now takes the whole screen (see
+   StageVideoOverlay), so a "Vídeo" tab here would have been a second door to
+   the same place — and the tab bar was costing the description a row of the
+   pane it is read from. */
+function StageContent({ stage, onPlayVideo }: { stage: Stage; onPlayVideo: (stage: Stage) => void }) {
   return (
     <>
-      {!hideChrome && (
-        <div className="stage-panel-header">
-          <div>
-            <span className="stage-panel-kicker">{stage.layer ? "Em toda a operação" : "Etapa da operação"}</span>
-            <h3>{stage.title}</h3>
-          </div>
+      <div className="stage-panel-header">
+        <div>
+          <span className="stage-panel-kicker">{stage.layer ? "Em toda a operação" : "Etapa da operação"}</span>
+          <h3>{stage.title}</h3>
         </div>
-      )}
-      {!hideChrome && (
-        <div className="stage-panel-tabs" data-active={tab} role="tablist" aria-label="Conteúdo da etapa">
-          <button type="button" role="tab" aria-selected={tab === "descricao"} className={tab === "descricao" ? "is-active" : ""} onPointerDown={(event) => activateTabOnTouch(event, "descricao")} onClick={() => setTab("descricao")}>Descrição</button>
-          <button type="button" role="tab" aria-selected={tab === "video"} className={tab === "video" ? "is-active" : ""} onPointerDown={(event) => activateTabOnTouch(event, "video")} onClick={() => setTab("video")}>Vídeo</button>
+      </div>
+      <div className="stage-panel-body">
+        <div className="stage-panel-description-wrap">
+          <p className="stage-panel-description">{stage.description}</p>
+          <button type="button" className="stage-watch-video-btn" onClick={() => onPlayVideo(stage)}>
+            <PlayIcon size={15} /> Assistir vídeo da etapa
+          </button>
         </div>
-      )}
-      <div className="stage-panel-body" role="tabpanel" data-tab={tab}>
-        {tab === "descricao" ? (
-          <div className="stage-panel-description-wrap"><p className="stage-panel-description">{stage.description}</p><button type="button" className="stage-watch-video-btn" onClick={() => setTab("video")}>Assistir vídeo da etapa</button></div>
-        ) : (
-          <VideoPlayer src={stage.videoSrc} className="stage-panel-video" onPlayingChange={setVideoPlaying} />
-        )}
       </div>
     </>
   );
@@ -77,12 +78,14 @@ function StageContent({ stage }: { stage: Stage }) {
 export function StagePanel({
   stage,
   onSelectStage,
+  onPlayVideo,
   tour,
   scenario,
   result,
 }: {
   stage: Stage | null;
   onSelectStage: (stage: Stage) => void;
+  onPlayVideo: (stage: Stage) => void;
   tour: TourController;
   scenario: Scenario;
   result: ScenarioResult;
@@ -90,7 +93,7 @@ export function StagePanel({
   return (
     <div className="stage-panel-screen">
       {stage ? (
-        <StageContent key={`${stage.id}-${tour.running}`} stage={stage} />
+        <StageContent key={stage.id} stage={stage} onPlayVideo={onPlayVideo} />
       ) : tour.running && tour.step && tour.index !== null ? (
         <TourTitleCard index={tour.index} title={tour.step.title} minutes={tourMinutes} />
       ) : scenario.id !== "normal" ? (

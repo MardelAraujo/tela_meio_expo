@@ -10,14 +10,14 @@ export class MapErrorBoundary extends Component<{ children: ReactNode }, { hasEr
   }
 
   componentDidCatch(error: unknown) {
-    console.error("Falha ao carregar o mapa 3D:", error);
+    console.error("Falha ao carregar o mapa do terminal:", error);
   }
 
   render() {
     if (!this.state.hasError) return this.props.children;
     return (
       <div className="map-error" role="alert">
-        <p>Não foi possível carregar o mapa 3D.</p>
+        <p>Não foi possível carregar o mapa do terminal.</p>
         <button onClick={() => window.location.reload()}>Tentar novamente</button>
       </div>
     );

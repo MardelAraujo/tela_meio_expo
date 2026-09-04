@@ -5,7 +5,8 @@ export interface TourStep {
   narration: string;
   /** Stages this chapter visits, in order. Empty = camera-only beat. */
   stageIds: StageId[];
-  /** Framing for a camera-only beat. Omitted = full terminal overview. */
+  /** Framing for a camera-only beat, in the artwork's own pixels (see
+      MAP_W/MAP_H in config/stages.ts). Omitted = full terminal overview. */
   focus?: { x: number; y: number; scale: number };
   seconds: number;
 }
@@ -26,9 +27,10 @@ export const tour: TourStep[] = [
     narration:
       "Tudo começa na portaria. O caminhão chega com janela agendada e o sistema já sabe quem é, o que traz e para onde vai. Sem papel, sem fila na guarita.",
     stageIds: [],
-    // Mid-altitude approach: frames the whole entrance before the next chapter
-    // dives into the check-in booth at the same coordinates.
-    focus: { x: -106, y: 119, scale: 2.1 },
+    // Mid-altitude approach: frames the whole entrance — the waiting yard, the
+    // office block and the gate itself — before the next chapter closes in on
+    // the guard booth where check-in happens.
+    focus: { x: 540, y: 782, scale: 1.8 },
     seconds: 14,
   },
   {
@@ -46,9 +48,9 @@ export const tour: TourStep[] = [
     seconds: 15,
   },
   {
-    title: "Inspeção",
+    title: "Vistoria",
     narration:
-      "O checklist digital registra a inspeção do veículo e da carga com foto. Se algum item não estiver conforme, a liberação simplesmente não acontece.",
+      "O checklist digital registra a vistoria do veículo e da carga com foto. Se algum item não estiver conforme, a liberação simplesmente não acontece.",
     stageIds: ["inspecao"],
     seconds: 15,
   },
