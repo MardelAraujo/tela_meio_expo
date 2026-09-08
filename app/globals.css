@@ -1270,13 +1270,16 @@ body:has(.stage-cinema) .ai-fab { display: none; }
 
 .tour-stage-video {
   display: block;
-  /* Auto both ways: a replaced element keeps its own intrinsic ratio, and the
-     clips are not all 16:9 (check-in and inspeção are 4:3). Letting the box be
-     the film — instead of a full-screen box with object-fit: contain — is what
-     lets the spill below hug the footage. Never cropped: cutting the frame
-     cuts off the interface the chapter is narrating. */
+  /* Auto both ways, so the box is the film — instead of a full-screen box with
+     object-fit: contain — which is what lets the spill below hug the footage.
+     The ratio is stated as well as inherited: every clip is 1920x1080 since
+     scripts/build-videos.mjs normalized the set (check-in and inspeção used to
+     be 4:3 and rendered a quarter narrower than the chapter before them), and
+     declaring it here reserves the right box before metadata lands instead of
+     letting the element open at its 300x150 default. */
   width: auto;
   height: auto;
+  aspect-ratio: 16 / 9;
   max-width: 100%;
   max-height: 100%;
   /* Light coming off the screen, not a frame around it. */

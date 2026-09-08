@@ -11,6 +11,7 @@ npm run dev     # dev server on :3000
 npm run build   # production build (also the only type-check — tsc has noEmit and no script)
 npm run lint    # eslint (flat config, next core-web-vitals + typescript)
 npm run assets  # legacy 3D model pipeline (public/models.orig/ -> public/models/); unused by the map
+npm run videos  # stage clips (public/videos.orig/ -> public/videos/); needs ffmpeg on PATH
 ```
 
 No test suite exists.
@@ -30,6 +31,8 @@ Single state atom: `activeStage: Stage | null` lives in `components/StageView.ts
 **The camera is imperative on purpose.** `apply()` writes `layer.style.transform` directly instead of going through state: a pan is one style assignment per `pointermove`, not a React render of the map and every pin. Pins live *inside* the transformed layer so they travel with the drawing for free, and counter-scale by `--map-inv` — a registered custom property (`@property` in `globals.css`), so it can be transitioned alongside the transform instead of snapping. `settle()` keeps the drawing over the viewport; without it, framing a corner stage showed half a pane of empty paper.
 
 **One derived pass runs at module load in `config/stages.ts`** and mutates the exported `stages` array: `cleanCopy` mojibake repair on titles/descriptions. New stages get it automatically. The `places` grouping above it survives from the 3D map, where five stages stood within 70m of the gatehouse; on this artwork every step has a building of its own, so no place currently holds more than one. Keep it — it is what a future drawing would need to put two steps in one building.
+
+**Every stage clip is 1920×1080, and `scripts/build-videos.mjs` is what guarantees it.** The players size the film by height, so a clip with a different ratio lands narrower than the one before it and its UI shrinks with it — which is exactly what `checkin-checkout` and `inspecao` did, arriving from the recorder at 1440×1080. Both mix letterboxed 16:9 desktop captures with full-bleed 4:3 zooms, so no crop is lossless; the script's `CROP` table holds the bottom-biased 16:9 window chosen per clip (it swallows every letterbox band and clears every caption, and gives up browser chrome at the top of the zoomed shots). Masters live in `public/videos.orig/` (gitignored, local). A new clip that is already 16:9 needs no entry.
 
 **Layer stages have no pin.** `auditoria` and `gestao` are readings across the whole operation rather than spots in it (`layer: true`); they are anchored to the dashboards in the drawing for reference, but selecting one holds the map at the overview and lets the panel do the talking.
 
